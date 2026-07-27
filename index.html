@@ -55,6 +55,39 @@
   <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="hero-frame" aria-hidden="true"></div>
+
+    <!-- ===== Gift Ribbon Marquee =====
+         A full-width, infinitely-scrolling strip of gift-themed badges
+         that sits in the open space above the eyebrow line. Content is
+         duplicated once inside the track so the loop is seamless: the
+         track animates exactly -50% (the width of one copy) before
+         resetting to 0. Decorative only, so it's hidden from screen
+         readers; nothing here is unique content. -->
+    <div class="gift-marquee" aria-hidden="true">
+      <div class="gift-marquee-track">
+        <div class="gift-marquee-group">
+          <span class="gift-marquee-item"><i class="fa-solid fa-gift"></i>Gift Wrapping</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-heart"></i>Made with Love</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-wand-magic-sparkles"></i>Personalised Touch</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-gifts"></i>Festive Hampers</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-ribbon"></i>Handpicked Quality</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-truck-fast"></i>Ships Pan-India</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-hand-holding-heart"></i>Thoughtful Surprises</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-star"></i>Cherished Moments</span>
+        </div>
+        <div class="gift-marquee-group">
+          <span class="gift-marquee-item"><i class="fa-solid fa-gift"></i>Gift Wrapping</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-heart"></i>Made with Love</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-wand-magic-sparkles"></i>Personalised Touch</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-gifts"></i>Festive Hampers</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-ribbon"></i>Handpicked Quality</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-truck-fast"></i>Ships Pan-India</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-hand-holding-heart"></i>Thoughtful Surprises</span>
+          <span class="gift-marquee-item"><i class="fa-solid fa-star"></i>Cherished Moments</span>
+        </div>
+      </div>
+    </div>
+
     <div class="hero-inner">
 
       <div class="hero-copy" data-reveal>
@@ -182,6 +215,33 @@
         </div>
       </article>
 
+    </div>
+  </section>
+
+  <!-- ===== DELIVERY LOCATIONS =====
+       A wrapping "chip cloud" of delivery destinations rather than a
+       fixed grid or a single-row route — this is the layout that
+       scales. Each place is one small pill; pills wrap onto as many
+       rows as needed, so going from 5 locations to 10, 20, or 50 is
+       just adding more <span> chips, no layout rework required.
+       USA gets the gold "Worldwide" treatment so it still stands out
+       as the one international stop among the Indian cities/states. -->
+  <section class="delivery-locations" data-reveal>
+    <div class="delivery-head">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>Where We've Delivered</p>
+      <h2>Gifts delivered near and far</h2>
+      <p class="delivery-intro">A growing list of places our hampers and keepsakes have already reached.</p>
+    </div>
+
+    <div class="delivery-chips">
+      <span class="delivery-chip delivery-chip--intl">
+        <i class="fa-solid fa-earth-americas"></i>USA
+        <em>Worldwide</em>
+      </span>
+      <span class="delivery-chip"><i class="fa-solid fa-location-dot"></i>Gujarat</span>
+      <span class="delivery-chip"><i class="fa-solid fa-location-dot"></i>Pune</span>
+      <span class="delivery-chip"><i class="fa-solid fa-location-dot"></i>Mumbai</span>
+      <span class="delivery-chip"><i class="fa-solid fa-location-dot"></i>Hyderabad</span>
     </div>
   </section>
 
