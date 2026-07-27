@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Products | Diya Gifts Gallery</title>
+<meta name="description" content="Browse Diya Gifts Gallery's collection by category — Faceless Portraits, Frames, Phone Covers, Hampers, Accessories, Unique Creations, Cards and Sketches.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<link rel="stylesheet" href="css/product.css">
+<link rel="icon" href="Logo/Logo.jpeg" type="image/jpeg">
+</head>
+<body>
+
+<!-- ===== Decorative grain overlay ===== -->
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="brand" aria-label="Diya Gifts Gallery — home">
+      <img src="Logo/Logo.jpeg" alt="Diya Gifts Gallery logo" class="brand-logo">
+    </a>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Primary">
+      <button class="nav-close" id="navClose" type="button" aria-label="Close navigation menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <ul>
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="products.html" class="nav-link active">Products</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+</header>
+
+<main id="main">
+
+  <!-- ===== PAGE HERO ===== -->
+  <section class="page-hero" data-reveal>
+    <div class="hero-frame" aria-hidden="true"></div>
+    <div class="page-hero-inner">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>Our Collection</p>
+      <h1 class="page-hero-title">Gifts for every<br><em>story</em> you want to tell</h1>
+      <p class="page-hero-text">
+        Explore our full catalogue, organised by category. Pick one below and we'll
+        show you only what belongs there.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       CATEGORY FILTER BAR
+       Pills are generated automatically from CATEGORY_META
+       in products-data.js — you do not need to edit this
+       markup to add/remove a category's pill.
+
+       Desktop behaviour: the bar no longer scrolls
+       horizontally. Pills wrap onto as many rows as needed
+       (see .filter-scroll rules in product.css) so every
+       category is visible at a glance on any screen width,
+       with roughly 5 pills per row on a typical desktop
+       viewport.
+
+       Mobile behaviour: on screens ≤860px this bar wraps into
+       a tidy 2-column grid so every category pill is visible
+       at a glance and users never have to guess there's more
+       to scroll to.
+       ===================================================== -->
+  <nav class="category-filter-bar" id="categoryFilterBar" aria-label="Filter products by category">
+    <div class="filter-scroll" id="filterScroll">
+      <!-- Filled in by JS: script below -->
+    </div>
+  </nav>
+
+  <!-- =====================================================
+       PRODUCTS
+       The grid below is populated entirely by JavaScript from
+       the PRODUCTS array in products-data.js.
+       TO ADD / EDIT / REMOVE A PRODUCT: edit products-data.js
+       — do not edit this HTML.
+       ===================================================== -->
+  <section class="products-section">
+    <div class="products-head" data-reveal>
+      <h2 class="products-heading" id="productsHeading">All Products</h2>
+      <p class="products-result-text">
+        Showing <strong id="resultCount">0</strong> item<span id="resultPlural">s</span>
+      </p>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <!-- Filled in by JS: script below -->
+    </div>
+
+    <div class="empty-state" id="emptyState" hidden>
+      <i class="fa-solid fa-box-open"></i>
+      <p>No products in this category just yet</p>
+      <span>Check back soon, or ask us directly — we may already have it in the works.</span>
+    </div>
+  </section>
+
+  <!-- ===== CTA BANNER ===== -->
+  <section class="cta-banner" data-reveal>
+    <div class="cta-inner">
+      <h2>Can't find what<br>you're picturing?</h2>
+      <p>Tell us the occasion and the vibe — we'll help you find or create the perfect gift.</p>
+      <a href="contact.html" class="btn btn-primary btn-light">
+        <span>Contact Us</span>
+        <i class="fa-solid fa-arrow-right-long"></i>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-top">
+
+    <div class="footer-brand">
+      <img src="Logo/Logo.jpeg" alt="Diya Gifts Gallery logo" class="footer-logo">
+      <p>Handpicked gifts for heartfelt moments — curated, wrapped and delivered with love.</p>
+    </div>
+
+    <div class="footer-links">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-contact">
+      <h4>Get in Touch</h4>
+      <ul>
+        <li><i class="fa-solid fa-location-dot"></i> Sangli, Maharashtra, India</li>
+        <li><i class="fa-solid fa-envelope"></i> diyagiftsgallery@gmail.com</li>
+        <li><i class="fa-solid fa-phone"></i> +91 74989 81334</li>
+      </ul>
+    </div>
+
+    <div class="footer-social">
+      <h4>Follow Along</h4>
+      <div class="social-icons">
+        <a href="https://www.instagram.com/diya_gifts_gallery/?hl=en" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" class="social-btn instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="https://www.youtube.com/@diya_gift_gallery" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube" class="social-btn youtube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; <span id="year"></span> Diya Gifts Gallery. All rights reserved.</p>
+    <p class="footer-credit">Designed and Developed by <span>Prajwal Shendge</span></p>
+  </div>
+</footer>
+
+<button id="backToTop" class="back-to-top" aria-label="Back to top">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>
+
+<!-- =====================================================
+     IMAGE LIGHTBOX
+     Opens when a product card / product image is clicked,
+     showing a large version of that product's photo.
+     ===================================================== -->
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox-overlay" id="lightboxOverlay"></div>
+  <div class="lightbox-content" role="dialog" aria-modal="true" aria-label="Product image preview">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image preview">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="lightbox-img-wrap">
+      <img id="lightboxImg" src="" alt="">
+    </div>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+</div>
+
+<!-- Product data (categories + products) — edit THIS file to change the catalogue -->
+<script src="products-data.js"></script>
+
+<script>
+  // ======================================================
+  // Current year in footer
+  // ======================================================
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ======================================================
+  // Mobile nav
+  // ======================================================
+  const navToggle  = document.getElementById('navToggle');
+  const navClose   = document.getElementById('navClose');
+  const mainNav    = document.getElementById('mainNav');
+  const navOverlay = document.getElementById('navOverlay');
+  const navLinks   = document.querySelectorAll('.main-nav a');
+
+  const isNavOpen = () => mainNav.classList.contains('open');
+
+  function openNav() {
+    mainNav.classList.add('open');
+    navToggle.classList.add('open');
+    navToggle.setAttribute('aria-expanded', 'true');
+    navOverlay.hidden = false;
+    requestAnimationFrame(() => navOverlay.classList.add('show'));
+    document.body.classList.add('nav-lock');
+  }
+
+  function closeNav() {
+    mainNav.classList.remove('open');
+    navToggle.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    navOverlay.classList.remove('show');
+    document.body.classList.remove('nav-lock');
+    window.setTimeout(() => {
+      if (!isNavOpen()) navOverlay.hidden = true;
+    }, 300);
+  }
+
+  navToggle.addEventListener('click', () => { isNavOpen() ? closeNav() : openNav(); });
+  navClose.addEventListener('click', closeNav);
+  navOverlay.addEventListener('click', closeNav);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isNavOpen()) closeNav(); });
+  navLinks.forEach(link => link.addEventListener('click', closeNav));
+
+  const mobileBreakpoint = window.matchMedia('(min-width: 861px)');
+  mobileBreakpoint.addEventListener('change', (e) => { if (e.matches && isNavOpen()) closeNav(); });
+
+  // ======================================================
+  // Header shrink + back to top
+  // ======================================================
+  const header = document.getElementById('siteHeader');
+  const backToTop = document.getElementById('backToTop');
+
+  const onScroll = () => {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+    backToTop.classList.toggle('show', window.scrollY > 500);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ======================================================
+  // Scroll reveal animation
+  // ======================================================
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) document.documentElement.classList.add('reduced-motion');
+
+  if ('IntersectionObserver' in window && !prefersReducedMotion) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+  } else {
+    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
+  }
+
+  // ======================================================
+  // BUILD FILTER PILLS  (from CATEGORY_META in products-data.js)
+  // ======================================================
+  const filterScroll = document.getElementById('filterScroll');
+
+  function pillHTML(filter, icon, label) {
+    return `
+      <button class="filter-pill${filter === 'all' ? ' active' : ''}" type="button" data-filter="${filter}">
+        <i class="fa-solid ${icon}"></i>
+        <span>${label}</span>
+        <em class="pill-count" id="count-${filter}">0</em>
+      </button>`;
+  }
+
+  let pillsHTML = pillHTML('all', 'fa-layer-group', 'All Products');
+  Object.keys(CATEGORY_META).forEach(key => {
+    const meta = CATEGORY_META[key];
+    pillsHTML += pillHTML(key, meta.icon, meta.label);
+  });
+  filterScroll.innerHTML = pillsHTML;
+
+  // ======================================================
+  // BUILD PRODUCT CARDS  (from PRODUCTS in products-data.js)
+  // ======================================================
+  const productGrid = document.getElementById('productGrid');
+
+  function whatsappLink(name) {
+    const text = `Hi! I'm interested in "${name}" from Diya Gifts Gallery. Could you share more details?`;
+    return `https://wa.me/917498981334?text=${encodeURIComponent(text)}`;
+  }
+
+  function cardHTML(product, index) {
+    const meta = CATEGORY_META[product.category] || { icon: 'fa-tag', label: product.category };
+    return `
+      <article class="product-card" data-category="${product.category}" data-index="${index}">
+        <div class="product-img-wrap" tabindex="0" role="button" aria-label="View larger image of ${product.name}">
+          <img src="${product.img}" alt="${product.alt}" loading="lazy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.closest('.product-img-wrap').dataset.noImage='true';">
+          <div class="product-img-fallback swatch-${product.category}"><i class="fa-solid ${meta.icon}"></i></div>
+        </div>
+        <div class="product-card-body">
+          <h3 class="product-name">${product.name}</h3>
+          <a class="product-enquire" href="${whatsappLink(product.name)}" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-whatsapp"></i> Enquire
+          </a>
+        </div>
+      </article>`;
+  }
+
+  productGrid.innerHTML = PRODUCTS.map(cardHTML).join('');
+
+  // ======================================================
+  // CATEGORY FILTERING
+  // ======================================================
+  const productCards    = Array.from(document.querySelectorAll('.product-card'));
+  const emptyState      = document.getElementById('emptyState');
+  const resultCount     = document.getElementById('resultCount');
+  const resultPlural    = document.getElementById('resultPlural');
+  const productsHeading = document.getElementById('productsHeading');
+
+  const categoryLabels = { all: 'All Products' };
+  Object.keys(CATEGORY_META).forEach(key => { categoryLabels[key] = CATEGORY_META[key].label; });
+
+  // Fill in the per-category counts on every pill
+  function updateCounts() {
+    const countAllEl = document.getElementById('count-all');
+    if (countAllEl) countAllEl.textContent = productCards.length;
+
+    Object.keys(CATEGORY_META).forEach(slug => {
+      const countEl = document.getElementById(`count-${slug}`);
+      if (countEl) countEl.textContent = productCards.filter(c => c.dataset.category === slug).length;
+    });
+  }
+
+  function applyFilter(filter) {
+    let visibleCount = 0;
+
+    productCards.forEach(card => {
+      const matches = filter === 'all' || card.dataset.category === filter;
+      card.hidden = !matches;
+      if (matches) visibleCount++;
+    });
+
+    emptyState.hidden = visibleCount !== 0;
+    productGrid.hidden = visibleCount === 0;
+
+    resultCount.textContent = visibleCount;
+    resultPlural.textContent = visibleCount === 1 ? '' : 's';
+    productsHeading.textContent = categoryLabels[filter] || 'Products';
+  }
+
+  updateCounts();
+
+  // ---- Pill click handling ----
+  filterScroll.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-pill');
+    if (!btn) return;
+
+    filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+
+    applyFilter(btn.dataset.filter);
+
+    // Reflect the choice in the URL so a category can be linked to directly
+    const url = new URL(window.location);
+    if (btn.dataset.filter === 'all') url.searchParams.delete('category');
+    else url.searchParams.set('category', btn.dataset.filter);
+    window.history.replaceState({}, '', url);
+  });
+
+  // ---- Deep-link support: products.html?category=frames ----
+  const requested = new URLSearchParams(window.location.search).get('category');
+  const initialBtn = requested
+    ? filterScroll.querySelector(`[data-filter="${requested}"]`)
+    : null;
+
+  if (initialBtn) {
+    filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    initialBtn.classList.add('active');
+    applyFilter(requested);
+  } else {
+    applyFilter('all');
+  }
+
+  // ======================================================
+  // IMAGE LIGHTBOX
+  // Clicking a product card (or its image) opens a large
+  // preview of that product's photo. Clicking the WhatsApp
+  // "Enquire" button still works as normal and never opens
+  // the lightbox.
+  // ======================================================
+  const lightbox        = document.getElementById('lightbox');
+  const lightboxOverlay = document.getElementById('lightboxOverlay');
+  const lightboxImg     = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose   = document.getElementById('lightboxClose');
+
+  let lastFocusedEl = null;
+
+  function openLightbox(src, alt, caption) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || caption || '';
+    lightboxCaption.textContent = caption || '';
+    lastFocusedEl = document.activeElement;
+    lightbox.hidden = false;
+    requestAnimationFrame(() => lightbox.classList.add('show'));
+    document.body.classList.add('nav-lock');
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('show');
+    document.body.classList.remove('nav-lock');
+    window.setTimeout(() => {
+      lightbox.hidden = true;
+      lightboxImg.src = '';
+    }, 250);
+    if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
+  }
+
+  productGrid.addEventListener('click', (e) => {
+    // Never hijack the WhatsApp enquiry button
+    if (e.target.closest('.product-enquire')) return;
+
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+
+    const imgWrap = card.querySelector('.product-img-wrap');
+    if (!imgWrap || imgWrap.dataset.noImage === 'true') return; // no real photo to zoom into
+
+    const imgEl = imgWrap.querySelector('img');
+    const nameEl = card.querySelector('.product-name');
+    if (!imgEl || !imgEl.src) return;
+
+    openLightbox(imgEl.src, imgEl.alt, nameEl ? nameEl.textContent : '');
+  });
+
+  // Keyboard support: Enter / Space on a focused image opens it too
+  productGrid.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const imgWrap = e.target.closest('.product-img-wrap');
+    if (!imgWrap) return;
+    e.preventDefault();
+    imgWrap.click();
+  });
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightboxOverlay.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
+</script>
+
+</body>
+</html>
