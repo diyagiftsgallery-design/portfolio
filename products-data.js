@@ -130,10 +130,22 @@ const PRODUCTS = [
 
 
   // ================= UNIQUE CREATIONS =================
-  { category: 'unique-creations', name: 'Resin Photo Art',            img: 'images/products/unique-creations/1.jpg', alt: 'Resin Photo Art' },
-  { category: 'unique-creations', name: '3D Pop-up Card Box',         img: 'images/products/unique-creations/2.jpg', alt: '3D Pop-up Card Box' },
-  { category: 'unique-creations', name: 'Custom Caricature Print',    img: 'images/products/unique-creations/3.jpg', alt: 'Custom Caricature Print' },
-  { category: 'unique-creations', name: 'Personalised Photo Puzzle',  img: 'images/products/unique-creations/4.jpg', alt: 'Personalised Photo Puzzle' },
+  { category: 'unique-creations', name: 'Unique Creation 1',  img: 'product images/unique creations/uc1.jpeg',  alt: 'Resin Photo Art' },
+  { category: 'unique-creations', name: 'Unique Creation 2',  img: 'product images/unique creations/uc2.png',    alt: 'Unique Creation 2' },
+  { category: 'unique-creations', name: 'Unique Creation 3',  img: 'product images/unique creations/uc3.jpeg',  alt: 'Unique Creation 3' },
+  { category: 'unique-creations', name: 'Unique Creation 4',  img: 'product images/unique creations/uc4.png',    alt: 'Unique Creation 4' },
+  { category: 'unique-creations', name: 'Unique Creation 5',  img: 'product images/unique creations/uc5.jpeg',  alt: 'Unique Creation 5' },
+  { category: 'unique-creations', name: 'Unique Creation 6',  img: 'product images/unique creations/uc6.jpeg',  alt: 'Unique Creation 6' },
+  { category: 'unique-creations', name: 'Unique Creation 7',  img: 'product images/unique creations/uc7.png',    alt: 'Unique Creation 7' },
+  { category: 'unique-creations', name: 'Unique Creation 8',  img: 'product images/unique creations/uc8.png',    alt: 'Unique Creation 8' },
+  { category: 'unique-creations', name: 'Unique Creation 9',  img: 'product images/unique creations/uc9.jpeg',  alt: 'Unique Creation 9' },
+  { category: 'unique-creations', name: 'Unique Creation 10', img: 'product images/unique creations/uc10.jpeg', alt: 'Unique Creation 10' },
+  { category: 'unique-creations', name: 'Unique Creation 11', img: 'product images/unique creations/uc11.jpeg', alt: 'Unique Creation 11' },
+  { category: 'unique-creations', name: 'Unique Creation 12', img: 'product images/unique creations/uc12.jpeg', alt: 'Unique Creation 12' },
+  { category: 'unique-creations', name: 'Unique Creation 13', img: 'product images/unique creations/uc13.jpeg', alt: 'Unique Creation 13' },
+  { category: 'unique-creations', name: 'Unique Creation 14', img: 'product images/unique creations/uc14.jpeg', alt: 'Unique Creation 14' },
+  { category: 'unique-creations', name: 'Unique Creation 15', img: 'product images/unique creations/uc15.jpeg', alt: 'Unique Creation 15' },
+  { category: 'unique-creations', name: 'Unique Creation 16', img: 'product images/unique creations/uc16.jpeg', alt: 'Unique Creation 16' },
 
   // ================= CARDS =================
   { category: 'cards', name: 'Card 1',  img: 'product images/cards/card1.jpeg',  alt: 'Card 1' },
