@@ -750,7 +750,56 @@ html.reduced-motion .scroll-cue span { animation: none; }
   font-weight: 500;
   color: rgba(250, 243, 230, 0.6);
 }
-.footer-credit span { color: var(--gold-light); font-weight: 700; }
+
+/* ===== Credit line (Designed & Developed by) + social icons =====
+   Mirrors the treatment used in style.css: the name stays gold/bold,
+   and a small row of LinkedIn / Instagram / Gmail icons sits right
+   after it, matching .social-btn styling above but sized down to
+   fit the compact footer-bottom font-size. */
+.credit-text > span { color: var(--gold-light); font-weight: 700; }
+
+.footer-credit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.credit-text { display: inline-block; }
+.credit-social {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.credit-social-btn {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(250, 243, 230, 0.1);
+  border: 1px solid rgba(250, 243, 230, 0.2);
+  font-size: 0.76rem;
+  color: var(--cream);
+  transition: transform 0.35s var(--ease), background 0.35s var(--ease), border-color 0.35s var(--ease), color 0.35s var(--ease);
+}
+.credit-social-btn.linkedin:hover {
+  background: #0A66C2;
+  border-color: transparent;
+  transform: translateY(-3px);
+}
+.credit-social-btn.instagram:hover {
+  background: linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7);
+  border-color: transparent;
+  transform: translateY(-3px);
+}
+.credit-social-btn.gmail:hover {
+  background: #EA4335;
+  border-color: transparent;
+  transform: translateY(-3px);
+}
 
 /* =========================================================
    BACK TO TOP
@@ -917,6 +966,7 @@ html.reduced-motion .scroll-cue span { animation: none; }
   .hero-stats { gap: 18px 22px; }
   .stat-num { font-size: 1.35rem; }
   .main-nav ul { max-width: 100%; }
+  .credit-social-btn { width: 23px; height: 23px; font-size: 0.68rem; }
 }
 
 /* ----- Short / landscape phone screens: keep the dropdown reachable ----- */
