@@ -146,6 +146,9 @@ const PRODUCTS = [
   { category: 'unique-creations', name: 'Unique Creation 14', img: 'product images/unique creations/uc14.jpeg', alt: 'Unique Creation 14' },
   { category: 'unique-creations', name: 'Unique Creation 15', img: 'product images/unique creations/uc15.jpeg', alt: 'Unique Creation 15' },
   { category: 'unique-creations', name: 'Unique Creation 16', img: 'product images/unique creations/uc16.jpeg', alt: 'Unique Creation 16' },
+  { category: 'unique-creations', name: 'Unique Creation 16', img: 'product images/unique creations/uc17.jpg', alt: 'Unique Creation 17' },
+  { category: 'unique-creations', name: 'Unique Creation 16', img: 'product images/unique creations/uc18.jpg', alt: 'Unique Creation 18' },
+  { category: 'unique-creations', name: 'Unique Creation 16', img: 'product images/unique creations/uc19.jpg', alt: 'Unique Creation 19' },
 
   // ================= CARDS =================
   { category: 'cards', name: 'Card 1',  img: 'product images/cards/card1.jpeg',  alt: 'Card 1' },
