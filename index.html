@@ -245,6 +245,31 @@
     </div>
   </section>
 
+  <!-- ===== CUSTOMER REVIEWS =====
+       Reviews are stored in the same Google Sheet used by the contact
+       form (a separate "Reviews" tab), via the same Apps Script Web
+       App. Existing reviews are fetched with JSONP (a <script> tag,
+       not fetch) because Apps Script doGet responses aren't readable
+       cross-origin with plain fetch — JSONP sidesteps that cleanly.
+       New reviews are posted the same "fire and forget" way the
+       contact form uses (mode: 'no-cors'), then shown immediately by
+       optimistically prepending a card to the grid. -->
+  <section class="reviews-section" data-reveal>
+    <div class="reviews-head">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>Customer Love</p>
+      <h2>What our customers say</h2>
+      <p class="reviews-intro">Real words from real people who've received a Diya Gifts Gallery gift.</p>
+      <button type="button" class="btn btn-primary" id="openReviewModal">
+        <span>Add Your Review</span>
+        <i class="fa-solid fa-pen"></i>
+      </button>
+    </div>
+
+    <div class="reviews-grid" id="reviewsGrid">
+      <p class="reviews-status" id="reviewsStatus">Loading reviews…</p>
+    </div>
+  </section>
+
   <!-- ===== QUOTE / STORY STRIP ===== -->
   <section class="story" data-reveal>
     <div class="story-inner">
@@ -336,6 +361,56 @@
 <button id="backToTop" class="back-to-top" aria-label="Back to top">
   <i class="fa-solid fa-arrow-up"></i>
 </button>
+
+<!-- ===== ADD REVIEW MODAL ===== -->
+<div class="review-modal-overlay" id="reviewModalOverlay" hidden>
+  <div class="review-modal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+    <button type="button" class="review-modal-close" id="reviewModalClose" aria-label="Close review form">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <p class="eyebrow"><span class="eyebrow-dot"></span>Share Your Experience</p>
+    <h3 id="reviewModalTitle">Add Your Review</h3>
+
+    <form class="review-form" id="reviewForm" novalidate>
+      <div class="form-group">
+        <label for="reviewName">Your Name</label>
+        <input type="text" id="reviewName" name="name" required autocomplete="name">
+      </div>
+
+      <div class="form-group">
+      <label for="reviewLocation">Your City</label>
+      <input type="text" id="reviewLocation" name="location" placeholder="Sangli" autocomplete="address-level2">
+      </div>
+
+      <div class="form-group">
+        <label>Your Rating</label>
+        <div class="star-rating" id="starRating" role="radiogroup" aria-label="Rating out of 5">
+          <i class="fa-solid fa-star" data-value="1" role="radio" aria-checked="false" aria-label="1 star" tabindex="0"></i>
+          <i class="fa-solid fa-star" data-value="2" role="radio" aria-checked="false" aria-label="2 stars" tabindex="0"></i>
+          <i class="fa-solid fa-star" data-value="3" role="radio" aria-checked="false" aria-label="3 stars" tabindex="0"></i>
+          <i class="fa-solid fa-star" data-value="4" role="radio" aria-checked="false" aria-label="4 stars" tabindex="0"></i>
+          <i class="fa-solid fa-star" data-value="5" role="radio" aria-checked="true" aria-label="5 stars" tabindex="0"></i>
+        </div>
+        <input type="hidden" id="reviewRatingInput" name="rating" value="5">
+      </div>
+
+      <div class="form-group">
+        <label for="reviewText">Your Review</label>
+        <textarea id="reviewText" name="review" rows="4" placeholder="Tell us about your experience..." required></textarea>
+      </div>
+
+      <input type="hidden" name="formType" value="review">
+
+      <button type="submit" class="btn btn-primary review-submit">
+        <span>Submit Review</span>
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+
+      <p class="form-note" id="reviewFormNote" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
 
 <script>
   // ===== Current year in footer =====
@@ -440,6 +515,250 @@
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) {
     document.documentElement.classList.add('reduced-motion');
+  }
+
+  // =========================================================
+  // ===== CUSTOMER REVIEWS (Google Sheets via Apps Script) =====
+  // =========================================================
+  //
+  // Uses the SAME Apps Script Web App deployment as the contact form.
+  // The script tells contact submissions and review submissions apart
+  // using a hidden "formType" field, and stores reviews in a separate
+  // "Reviews" sheet tab (auto-created by the script if missing).
+  const GOOGLE_SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyUiOFzHXuqKMsqGqJp6suej-RZkJP8zpHd1JIeLhncRG3IHjGx10q-mt538NKDZtrz/exec';
+
+  const reviewsGrid        = document.getElementById('reviewsGrid');
+  const reviewsStatus      = document.getElementById('reviewsStatus');
+  const openReviewModalBtn = document.getElementById('openReviewModal');
+  const reviewModalOverlay = document.getElementById('reviewModalOverlay');
+  const reviewModalClose   = document.getElementById('reviewModalClose');
+  const reviewForm         = document.getElementById('reviewForm');
+  const reviewFormNote     = document.getElementById('reviewFormNote');
+  const starRating         = document.getElementById('starRating');
+  const reviewRatingInput  = document.getElementById('reviewRatingInput');
+  const reviewNameInput    = document.getElementById('reviewName');
+
+  // ----- escape any user-entered text before it goes into innerHTML -----
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function formatReviewDate(timestamp) {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function renderReviewCard(review) {
+  const name     = escapeHtml(review.name || 'Anonymous');
+  const location = escapeHtml(review.location || '');
+  const text     = escapeHtml(review.review || '');
+  const rating   = Math.max(1, Math.min(5, parseInt(review.rating, 10) || 5));
+  const initial  = name.trim().charAt(0).toUpperCase() || 'D';
+  const dateStr  = formatReviewDate(review.timestamp);
+  const stars    = '<i class="fa-solid fa-star"></i>'.repeat(rating) +
+                    '<i class="fa-regular fa-star"></i>'.repeat(5 - rating);
+
+  return (
+    '<article class="review-card">' +
+      '<div class="review-card-top">' +
+        '<span class="review-avatar">' + initial + '</span>' +
+        '<div class="review-card-heading">' +
+          '<h4 class="review-name">' + name + '</h4>' +
+          (location ? '<p class="review-location"><i class="fa-solid fa-location-dot"></i> ' + location + '</p>' : '') +
+          '<div class="review-stars">' + stars + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<p class="review-text">' + text + '</p>' +
+      (dateStr ? '<span class="review-date">' + dateStr + '</span>' : '') +
+    '</article>'
+  );
+}
+
+  function renderReviews(reviews) {
+    if (!reviewsGrid) return;
+
+    if (!reviews || reviews.length === 0) {
+      reviewsGrid.innerHTML = '<p class="reviews-status">Be the first to share your experience!</p>';
+      return;
+    }
+
+    reviewsGrid.innerHTML = reviews.map(renderReviewCard).join('');
+  }
+
+  // ----- fetch existing reviews via JSONP -----
+  // Plain fetch() to an Apps Script GET endpoint gets blocked by CORS
+  // from a different origin (GitHub Pages). Loading it as a <script>
+  // tag sidesteps that entirely, which is why the endpoint is asked
+  // to wrap its JSON in a callback function.
+  function fetchReviews() {
+    return new Promise((resolve, reject) => {
+      const callbackName = '__reviewsCallback_' + Date.now();
+      const script = document.createElement('script');
+
+      const cleanup = () => {
+        delete window[callbackName];
+        script.remove();
+      };
+
+      window[callbackName] = function (data) {
+        cleanup();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error('Failed to load reviews'));
+      };
+
+      script.src = GOOGLE_SHEETS_ENDPOINT + '?action=getReviews&callback=' + callbackName;
+      document.body.appendChild(script);
+    });
+  }
+
+  function loadReviews() {
+    if (!reviewsGrid || GOOGLE_SHEETS_ENDPOINT.includes('YOUR_DEPLOYMENT_ID')) return;
+
+    fetchReviews()
+      .then((reviews) => renderReviews(reviews))
+      .catch((err) => {
+        console.error('Could not load reviews:', err);
+        if (reviewsStatus) {
+          reviewsStatus.textContent = 'Could not load reviews right now. Please refresh to try again.';
+        }
+      });
+  }
+
+  loadReviews();
+
+  // ----- modal open / close -----
+  function openReviewForm() {
+    if (!reviewModalOverlay) return;
+    reviewModalOverlay.hidden = false;
+    requestAnimationFrame(() => reviewModalOverlay.classList.add('show'));
+    document.body.classList.add('nav-lock');
+    if (reviewNameInput) reviewNameInput.focus();
+  }
+
+  function closeReviewForm() {
+    if (!reviewModalOverlay) return;
+    reviewModalOverlay.classList.remove('show');
+    document.body.classList.remove('nav-lock');
+    window.setTimeout(() => {
+      reviewModalOverlay.hidden = true;
+    }, 300);
+  }
+
+  if (openReviewModalBtn) openReviewModalBtn.addEventListener('click', openReviewForm);
+  if (reviewModalClose)   reviewModalClose.addEventListener('click', closeReviewForm);
+  if (reviewModalOverlay) {
+    reviewModalOverlay.addEventListener('click', (e) => {
+      if (e.target === reviewModalOverlay) closeReviewForm();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && reviewModalOverlay && !reviewModalOverlay.hidden) closeReviewForm();
+  });
+
+  // ----- star rating picker -----
+  if (starRating) {
+    const starEls = Array.from(starRating.querySelectorAll('i'));
+
+    function setStars(value) {
+      starEls.forEach((star) => {
+        const starValue = parseInt(star.dataset.value, 10);
+        const filled = starValue <= value;
+        star.classList.toggle('fa-solid', filled);
+        star.classList.toggle('fa-regular', !filled);
+        star.setAttribute('aria-checked', starValue === value ? 'true' : 'false');
+      });
+      reviewRatingInput.value = String(value);
+    }
+
+    starEls.forEach((star) => {
+      star.addEventListener('click', () => setStars(parseInt(star.dataset.value, 10)));
+      star.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setStars(parseInt(star.dataset.value, 10));
+        }
+      });
+    });
+
+    setStars(5); // sensible default
+  }
+
+  // ----- submit a new review -----
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (!reviewForm.checkValidity()) {
+        reviewForm.reportValidity();
+        return;
+      }
+
+      if (GOOGLE_SHEETS_ENDPOINT.includes('YOUR_DEPLOYMENT_ID')) {
+        reviewFormNote.textContent = 'Reviews are not connected yet — add your Google Apps Script URL in the code.';
+        reviewFormNote.classList.remove('success');
+        reviewFormNote.classList.add('show', 'error');
+        return;
+      }
+
+      const submitBtn = reviewForm.querySelector('.review-submit');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('is-sending');
+      reviewFormNote.classList.remove('show', 'success', 'error');
+
+      const formData = new FormData(reviewForm);
+
+      // Apps Script Web Apps don't return CORS headers for fetch to read,
+      // so this is sent in 'no-cors' mode — the response can't be read,
+      // but the data still reaches the Sheet. Any request that doesn't
+      // throw a network error is treated as a success.
+      fetch(GOOGLE_SHEETS_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      })
+        .then(() => {
+          // Show the new review immediately without waiting for a reload —
+          // it's already been written to the Sheet in the background.
+          const newReview = {
+            name: formData.get('name'),
+            location: formData.get('location'),
+            review: formData.get('review'),
+            rating: formData.get('rating'),
+            timestamp: new Date().toISOString()
+          };
+
+          const emptyState = reviewsGrid.querySelector('.reviews-status');
+          if (emptyState) reviewsGrid.innerHTML = '';
+          reviewsGrid.insertAdjacentHTML('afterbegin', renderReviewCard(newReview));
+
+          reviewFormNote.textContent = 'Thank you! Your review has been posted.';
+          reviewFormNote.classList.add('show', 'success');
+          reviewForm.reset();
+          if (starRating) {
+            const fiveStar = starRating.querySelector('[data-value="5"]');
+            if (fiveStar) fiveStar.click();
+          }
+
+          window.setTimeout(closeReviewForm, 1200);
+        })
+        .catch((err) => {
+          console.error('Review submission failed:', err);
+          reviewFormNote.textContent = 'Something went wrong posting your review. Please try again.';
+          reviewFormNote.classList.add('show', 'error');
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('is-sending');
+        });
+    });
   }
 </script>
 
