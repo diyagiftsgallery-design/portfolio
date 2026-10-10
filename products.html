@@ -66,21 +66,9 @@
 
   <!-- =====================================================
        CATEGORY FILTER BAR
-       Pills are generated automatically from CATEGORY_META
-       in products-data.js — you do not need to edit this
-       markup to add/remove a category's pill.
-
-       Desktop behaviour: the bar no longer scrolls
-       horizontally. Pills wrap onto as many rows as needed
-       (see .filter-scroll rules in product.css) so every
-       category is visible at a glance on any screen width,
-       with roughly 5 pills per row on a typical desktop
-       viewport.
-
-       Mobile behaviour: on screens ≤860px this bar wraps into
-       a tidy 2-column grid so every category pill is visible
-       at a glance and users never have to guess there's more
-       to scroll to.
+       Pills are generated automatically from the categories
+       (loaded from the Google Sheet via catalog-loader.js,
+       falling back to CATEGORY_META in products-data.js).
        ===================================================== -->
   <nav class="category-filter-bar" id="categoryFilterBar" aria-label="Filter products by category">
     <div class="filter-scroll" id="filterScroll">
@@ -90,9 +78,8 @@
 
   <!-- =====================================================
        PRODUCTS
-       The grid below is populated entirely by JavaScript from
-       the PRODUCTS array in products-data.js.
-       TO ADD / EDIT / REMOVE A PRODUCT: edit products-data.js
+       The grid below is populated entirely by JavaScript.
+       TO ADD / EDIT / REMOVE PRODUCTS: use admin.html
        — do not edit this HTML.
        ===================================================== -->
   <section class="products-section">
@@ -187,6 +174,8 @@
       </span>
     </p>
   </div>
+</footer>
+
 <button id="backToTop" class="back-to-top" aria-label="Back to top">
   <i class="fa-solid fa-arrow-up"></i>
 </button>
@@ -209,8 +198,13 @@
   </div>
 </div>
 
-<!-- Product data (categories + products) — edit THIS file to change the catalogue -->
+<!-- Catalogue scripts. ORDER MATTERS:
+     1) config.js         — your Apps Script web app URL
+     2) products-data.js  — built-in fallback catalogue
+     3) catalog-loader.js — replaces the fallback with Google Sheet data -->
+<script src="config.js"></script>
 <script src="products-data.js"></script>
+<script src="catalog-loader.js"></script>
 
 <script>
   // ======================================================
@@ -294,196 +288,207 @@
   }
 
   // ======================================================
-  // BUILD FILTER PILLS  (from CATEGORY_META in products-data.js)
+  // CATALOGUE  (everything below waits for the Google Sheet
+  // data; if it can't load, the built-in data is used)
   // ======================================================
-  const filterScroll = document.getElementById('filterScroll');
+  (async function () {
+    // Safe even if catalog-loader.js failed to load
+    await (typeof catalogReady !== 'undefined' ? catalogReady : Promise.resolve());
 
-  function pillHTML(filter, icon, label) {
-    return `
-      <button class="filter-pill${filter === 'all' ? ' active' : ''}" type="button" data-filter="${filter}">
-        <i class="fa-solid ${icon}"></i>
-        <span>${label}</span>
-        <em class="pill-count" id="count-${filter}">0</em>
-      </button>`;
-  }
+    // ======================================================
+    // BUILD FILTER PILLS
+    // ======================================================
+    const filterScroll = document.getElementById('filterScroll');
 
-  let pillsHTML = pillHTML('all', 'fa-layer-group', 'All Products');
-  Object.keys(CATEGORY_META).forEach(key => {
-    const meta = CATEGORY_META[key];
-    pillsHTML += pillHTML(key, meta.icon, meta.label);
-  });
-  filterScroll.innerHTML = pillsHTML;
+    function pillHTML(filter, icon, label) {
+      return `
+        <button class="filter-pill${filter === 'all' ? ' active' : ''}" type="button" data-filter="${filter}">
+          <i class="fa-solid ${icon}"></i>
+          <span>${label}</span>
+          <em class="pill-count" id="count-${filter}">0</em>
+        </button>`;
+    }
 
-  // ======================================================
-  // BUILD PRODUCT CARDS  (from PRODUCTS in products-data.js)
-  // ======================================================
-  const productGrid = document.getElementById('productGrid');
-
-  function whatsappLink(name) {
-    const text = `Hi! I'm interested in "${name}" from Diya Gifts Gallery. Could you share more details?`;
-    return `https://wa.me/917498981334?text=${encodeURIComponent(text)}`;
-  }
-
-  function cardHTML(product, index) {
-    const meta = CATEGORY_META[product.category] || { icon: 'fa-tag', label: product.category };
-    return `
-      <article class="product-card" data-category="${product.category}" data-index="${index}">
-        <div class="product-img-wrap" tabindex="0" role="button" aria-label="View larger image of ${product.name}">
-          <img src="${product.img}" alt="${product.alt}" loading="lazy"
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.closest('.product-img-wrap').dataset.noImage='true';">
-          <div class="product-img-fallback swatch-${product.category}"><i class="fa-solid ${meta.icon}"></i></div>
-        </div>
-        <div class="product-card-body">
-          <h3 class="product-name">${product.name}</h3>
-          <a class="product-enquire" href="${whatsappLink(product.name)}" target="_blank" rel="noopener noreferrer">
-            <i class="fa-brands fa-whatsapp"></i> Enquire
-          </a>
-        </div>
-      </article>`;
-  }
-
-  productGrid.innerHTML = PRODUCTS.map(cardHTML).join('');
-
-  // ======================================================
-  // CATEGORY FILTERING
-  // ======================================================
-  const productCards    = Array.from(document.querySelectorAll('.product-card'));
-  const emptyState      = document.getElementById('emptyState');
-  const resultCount     = document.getElementById('resultCount');
-  const resultPlural    = document.getElementById('resultPlural');
-  const productsHeading = document.getElementById('productsHeading');
-
-  const categoryLabels = { all: 'All Products' };
-  Object.keys(CATEGORY_META).forEach(key => { categoryLabels[key] = CATEGORY_META[key].label; });
-
-  // Fill in the per-category counts on every pill
-  function updateCounts() {
-    const countAllEl = document.getElementById('count-all');
-    if (countAllEl) countAllEl.textContent = productCards.length;
-
-    Object.keys(CATEGORY_META).forEach(slug => {
-      const countEl = document.getElementById(`count-${slug}`);
-      if (countEl) countEl.textContent = productCards.filter(c => c.dataset.category === slug).length;
+    let pillsHTML = pillHTML('all', 'fa-layer-group', 'All Products');
+    Object.keys(CATEGORY_META).forEach(key => {
+      const meta = CATEGORY_META[key];
+      pillsHTML += pillHTML(key, meta.icon, meta.label);
     });
-  }
+    filterScroll.innerHTML = pillsHTML;
 
-  function applyFilter(filter) {
-    let visibleCount = 0;
+    // ======================================================
+    // BUILD PRODUCT CARDS
+    // ======================================================
+    const productGrid = document.getElementById('productGrid');
 
-    productCards.forEach(card => {
-      const matches = filter === 'all' || card.dataset.category === filter;
-      card.hidden = !matches;
-      if (matches) visibleCount++;
+    function whatsappLink(name) {
+      const text = `Hi! I'm interested in "${name}" from Diya Gifts Gallery. Could you share more details?`;
+      return `https://wa.me/917498981334?text=${encodeURIComponent(text)}`;
+    }
+
+    function cardHTML(product, index) {
+      const meta = CATEGORY_META[product.category] || { icon: 'fa-tag', label: product.category };
+      return `
+        <article class="product-card" data-category="${product.category}" data-index="${index}">
+          <div class="product-img-wrap" tabindex="0" role="button" aria-label="View larger image of ${product.name}">
+            <img src="${product.img}" alt="${product.alt}" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.closest('.product-img-wrap').dataset.noImage='true';">
+            <div class="product-img-fallback swatch-${product.category}"><i class="fa-solid ${meta.icon}"></i></div>
+          </div>
+          <div class="product-card-body">
+            <h3 class="product-name">${product.name}</h3>
+            <a class="product-enquire" href="${whatsappLink(product.name)}" target="_blank" rel="noopener noreferrer">
+              <i class="fa-brands fa-whatsapp"></i> Enquire
+            </a>
+          </div>
+        </article>`;
+    }
+
+    productGrid.innerHTML = PRODUCTS.map(cardHTML).join('');
+
+    // ======================================================
+    // CATEGORY FILTERING
+    // ======================================================
+    const productCards    = Array.from(document.querySelectorAll('.product-card'));
+    const emptyState      = document.getElementById('emptyState');
+    const resultCount     = document.getElementById('resultCount');
+    const resultPlural    = document.getElementById('resultPlural');
+    const productsHeading = document.getElementById('productsHeading');
+
+    const categoryLabels = { all: 'All Products' };
+    Object.keys(CATEGORY_META).forEach(key => { categoryLabels[key] = CATEGORY_META[key].label; });
+
+    // Fill in the per-category counts on every pill
+    function updateCounts() {
+      const countAllEl = document.getElementById('count-all');
+      if (countAllEl) countAllEl.textContent = productCards.length;
+
+      Object.keys(CATEGORY_META).forEach(slug => {
+        const countEl = document.getElementById(`count-${slug}`);
+        if (countEl) countEl.textContent = productCards.filter(c => c.dataset.category === slug).length;
+      });
+    }
+
+    function applyFilter(filter) {
+      let visibleCount = 0;
+
+      productCards.forEach(card => {
+        const matches = filter === 'all' || card.dataset.category === filter;
+        card.hidden = !matches;
+        if (matches) visibleCount++;
+      });
+
+      emptyState.hidden = visibleCount !== 0;
+      productGrid.hidden = visibleCount === 0;
+
+      resultCount.textContent = visibleCount;
+      resultPlural.textContent = visibleCount === 1 ? '' : 's';
+      productsHeading.textContent = categoryLabels[filter] || 'Products';
+    }
+
+    updateCounts();
+
+    // ---- Pill click handling ----
+    filterScroll.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-pill');
+      if (!btn) return;
+
+      filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+
+      applyFilter(btn.dataset.filter);
+
+      // Reflect the choice in the URL so a category can be linked to directly
+      const url = new URL(window.location);
+      if (btn.dataset.filter === 'all') url.searchParams.delete('category');
+      else url.searchParams.set('category', btn.dataset.filter);
+      window.history.replaceState({}, '', url);
     });
 
-    emptyState.hidden = visibleCount !== 0;
-    productGrid.hidden = visibleCount === 0;
+    // ---- Deep-link support: products.html?category=frames ----
+    const requested = new URLSearchParams(window.location.search).get('category');
+    let initialBtn = null;
+    if (requested) {
+      initialBtn = Array.from(filterScroll.querySelectorAll('.filter-pill'))
+        .find(p => p.dataset.filter === requested) || null;
+    }
 
-    resultCount.textContent = visibleCount;
-    resultPlural.textContent = visibleCount === 1 ? '' : 's';
-    productsHeading.textContent = categoryLabels[filter] || 'Products';
-  }
+    if (initialBtn) {
+      filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      initialBtn.classList.add('active');
+      applyFilter(requested);
+    } else {
+      applyFilter('all');
+    }
 
-  updateCounts();
+    // ======================================================
+    // IMAGE LIGHTBOX
+    // Clicking a product card (or its image) opens a large
+    // preview of that product's photo. Clicking the WhatsApp
+    // "Enquire" button still works as normal and never opens
+    // the lightbox.
+    // ======================================================
+    const lightbox        = document.getElementById('lightbox');
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImg     = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxClose   = document.getElementById('lightboxClose');
 
-  // ---- Pill click handling ----
-  filterScroll.addEventListener('click', (e) => {
-    const btn = e.target.closest('.filter-pill');
-    if (!btn) return;
+    let lastFocusedEl = null;
 
-    filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
+    function openLightbox(src, alt, caption) {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || caption || '';
+      lightboxCaption.textContent = caption || '';
+      lastFocusedEl = document.activeElement;
+      lightbox.hidden = false;
+      requestAnimationFrame(() => lightbox.classList.add('show'));
+      document.body.classList.add('nav-lock');
+      lightboxClose.focus();
+    }
 
-    applyFilter(btn.dataset.filter);
+    function closeLightbox() {
+      lightbox.classList.remove('show');
+      document.body.classList.remove('nav-lock');
+      window.setTimeout(() => {
+        lightbox.hidden = true;
+        lightboxImg.src = '';
+      }, 250);
+      if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
+    }
 
-    // Reflect the choice in the URL so a category can be linked to directly
-    const url = new URL(window.location);
-    if (btn.dataset.filter === 'all') url.searchParams.delete('category');
-    else url.searchParams.set('category', btn.dataset.filter);
-    window.history.replaceState({}, '', url);
-  });
+    productGrid.addEventListener('click', (e) => {
+      // Never hijack the WhatsApp enquiry button
+      if (e.target.closest('.product-enquire')) return;
 
-  // ---- Deep-link support: products.html?category=frames ----
-  const requested = new URLSearchParams(window.location.search).get('category');
-  const initialBtn = requested
-    ? filterScroll.querySelector(`[data-filter="${requested}"]`)
-    : null;
+      const card = e.target.closest('.product-card');
+      if (!card) return;
 
-  if (initialBtn) {
-    filterScroll.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    initialBtn.classList.add('active');
-    applyFilter(requested);
-  } else {
-    applyFilter('all');
-  }
+      const imgWrap = card.querySelector('.product-img-wrap');
+      if (!imgWrap || imgWrap.dataset.noImage === 'true') return; // no real photo to zoom into
 
-  // ======================================================
-  // IMAGE LIGHTBOX
-  // Clicking a product card (or its image) opens a large
-  // preview of that product's photo. Clicking the WhatsApp
-  // "Enquire" button still works as normal and never opens
-  // the lightbox.
-  // ======================================================
-  const lightbox        = document.getElementById('lightbox');
-  const lightboxOverlay = document.getElementById('lightboxOverlay');
-  const lightboxImg     = document.getElementById('lightboxImg');
-  const lightboxCaption = document.getElementById('lightboxCaption');
-  const lightboxClose   = document.getElementById('lightboxClose');
+      const imgEl = imgWrap.querySelector('img');
+      const nameEl = card.querySelector('.product-name');
+      if (!imgEl || !imgEl.src) return;
 
-  let lastFocusedEl = null;
+      openLightbox(imgEl.src, imgEl.alt, nameEl ? nameEl.textContent : '');
+    });
 
-  function openLightbox(src, alt, caption) {
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || caption || '';
-    lightboxCaption.textContent = caption || '';
-    lastFocusedEl = document.activeElement;
-    lightbox.hidden = false;
-    requestAnimationFrame(() => lightbox.classList.add('show'));
-    document.body.classList.add('nav-lock');
-    lightboxClose.focus();
-  }
+    // Keyboard support: Enter / Space on a focused image opens it too
+    productGrid.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const imgWrap = e.target.closest('.product-img-wrap');
+      if (!imgWrap) return;
+      e.preventDefault();
+      imgWrap.click();
+    });
 
-  function closeLightbox() {
-    lightbox.classList.remove('show');
-    document.body.classList.remove('nav-lock');
-    window.setTimeout(() => {
-      lightbox.hidden = true;
-      lightboxImg.src = '';
-    }, 250);
-    if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
-  }
-
-  productGrid.addEventListener('click', (e) => {
-    // Never hijack the WhatsApp enquiry button
-    if (e.target.closest('.product-enquire')) return;
-
-    const card = e.target.closest('.product-card');
-    if (!card) return;
-
-    const imgWrap = card.querySelector('.product-img-wrap');
-    if (!imgWrap || imgWrap.dataset.noImage === 'true') return; // no real photo to zoom into
-
-    const imgEl = imgWrap.querySelector('img');
-    const nameEl = card.querySelector('.product-name');
-    if (!imgEl || !imgEl.src) return;
-
-    openLightbox(imgEl.src, imgEl.alt, nameEl ? nameEl.textContent : '');
-  });
-
-  // Keyboard support: Enter / Space on a focused image opens it too
-  productGrid.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const imgWrap = e.target.closest('.product-img-wrap');
-    if (!imgWrap) return;
-    e.preventDefault();
-    imgWrap.click();
-  });
-
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightboxOverlay.addEventListener('click', closeLightbox);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
-  });
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxOverlay.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+    });
+  })();
 </script>
 
 </body>
