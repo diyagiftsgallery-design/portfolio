@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin | Diya Gifts Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/product.css">
+<link rel="icon" href="Logo/Logo.jpeg" type="image/jpeg">
+<style>
+  body { padding: 24px 16px 80px; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+  .bar h1 { font-size: 1.4rem; }
+  .card { background: #fff; border: 1px solid rgba(20,56,48,.14); border-radius: var(--radius-md); padding: 22px; margin-bottom: 22px; }
+  .card h2 { font-size: 1.1rem; margin-bottom: 14px; }
+  .login { max-width: 360px; margin: 14vh auto 0; }
+  label { display: block; font-size: .82rem; font-weight: 700; margin: 12px 0 5px; }
+  input[type=text], input[type=password], select, input[type=file] {
+    width: 100%; padding: 11px 14px; font: inherit; font-size: .92rem;
+    border: 1.5px solid rgba(20,56,48,.2); border-radius: var(--radius-sm); background: #fff;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .btn { margin-top: 16px; cursor: pointer; padding: 12px 22px; }
+  .btn[disabled] { opacity: .6; cursor: wait; }
+  .btn-sm { margin: 0; padding: 7px 14px; font-size: .78rem; }
+  .btn-danger { background: var(--rose); color: #fff; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .tab { padding: 9px 20px; border-radius: 999px; border: 1.5px solid rgba(20,56,48,.2); background: #fff; font-weight: 700; }
+  .tab.on { background: var(--green-deep); color: var(--cream); border-color: transparent; }
+  .preview { margin-top: 10px; max-width: 160px; border-radius: var(--radius-sm); }
+  .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .item { position: relative; border: 1px solid rgba(20,56,48,.12); border-radius: var(--radius-sm); overflow: hidden; display: flex; flex-direction: column; }
+  .item img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--cream-deep); }
+  .item > div { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; font-size: .8rem; font-weight: 700; }
+  .item .no { position: absolute; top: 8px; left: 8px; min-width: 28px; height: 28px; padding: 0 8px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: var(--green-deep); color: #fff; font-size: .75rem; font-weight: 800; z-index: 1; }
+  .acts { display: flex; gap: 8px; margin-top: auto; }
+  .acts .btn { flex: 1; margin: 0; padding: 7px 8px; }
+  .modal { position: fixed; inset: 0; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(10,32,24,.7); }
+  .modal .card { width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto; margin: 0; }
+  .modal-acts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .catrow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(20,56,48,.1); }
+  .catrow span { flex: 1; font-weight: 700; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--green-deep); color: #fff; padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: .88rem; z-index: 1000; max-width: 90vw; }
+  .toast.err { background: var(--rose); }
+  .muted { font-size: .85rem; color: var(--ink-soft); }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="loginView" class="card login">
+    <h2>Admin login</h2>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button class="btn btn-primary" id="loginBtn" type="button">Log in</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="appView" hidden>
+    <div class="bar">
+      <h1>Catalogue manager</h1>
+      <button class="btn btn-outline btn-sm" id="logoutBtn" type="button">Log out</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-tab="products" type="button">Products</button>
+      <button class="tab" data-tab="categories" type="button">Categories</button>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div id="tab-products">
+      <div class="card">
+        <h2>Add a product</h2>
+        <div class="row">
+          <div><label for="pCat">Category</label><select id="pCat"></select></div>
+          <div><label for="pName">Product name</label><input type="text" id="pName" maxlength="80"></div>
+        </div>
+        <label for="pImg">Photo</label>
+        <input type="file" id="pImg" accept="image/*">
+        <img id="pPrev" class="preview" alt="" hidden>
+        <button class="btn btn-primary" id="addProdBtn" type="button">Add product</button>
+      </div>
+      <div class="card">
+        <h2>All products (<span id="pCount">0</span>)</h2>
+        <select id="pFilter" style="max-width:260px;margin-bottom:16px"></select>
+        <div class="items" id="items"></div>
+        <p class="muted" id="pEmpty" hidden>No products yet. Add your first one above.</p>
+      </div>
+      <div class="card" id="importCard" hidden>
+        <h2>Import current website products</h2>
+        <p class="muted">Your sheet has no products yet. Import the products currently on the website so you can manage them here. Do this once.</p>
+        <button class="btn btn-outline" id="importBtn" type="button">Import existing products</button>
+      </div>
+    </div>
+
+    <!-- CATEGORIES TAB -->
+    <div id="tab-categories" hidden>
+      <div class="card">
+        <h2>Add a category</h2>
+        <div class="row">
+          <div><label for="cName">Category name</label><input type="text" id="cName" maxlength="40"></div>
+          <div><label for="cIcon">Icon</label><select id="cIcon"></select></div>
+        </div>
+        <button class="btn btn-primary" id="addCatBtn" type="button">Add category</button>
+      </div>
+      <div class="card">
+        <h2>Your categories</h2>
+        <div id="catList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PRODUCT DIALOG -->
+<div class="modal" id="editModal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <h2 id="editTitle">Edit product <span id="eNo"></span></h2>
+    <label for="eCat">Category</label>
+    <select id="eCat"></select>
+    <label for="eName">Product name</label>
+    <input type="text" id="eName" maxlength="80">
+    <label for="eImg">Photo (leave empty to keep the current one)</label>
+    <input type="file" id="eImg" accept="image/*">
+    <img id="ePrev" class="preview" alt="">
+    <div class="modal-acts">
+      <button class="btn btn-primary" id="eSave" type="button">Save changes</button>
+      <button class="btn btn-outline" id="eCancel" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="products-data.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ICONS = [['fa-gift','Gift'],['fa-user-large','Person'],['fa-images','Frame'],['fa-mobile-screen-button','Phone'],
+  ['fa-basket-shopping','Basket'],['fa-gem','Gem'],['fa-wand-magic-sparkles','Magic'],['fa-envelope-open-text','Card'],
+  ['fa-pen-nib','Pen'],['fa-heart','Heart'],['fa-cake-candles','Cake'],['fa-ring','Ring'],['fa-palette','Palette'],['fa-star','Star']];
+let token = sessionStorage.getItem('adm') || '', cats = [], prods = [], toastTimer;
+
+function toast(msg, err) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg; t.setAttribute('role', 'status');
+  document.body.appendChild(t); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 3500);
+}
+function busy(btn, on, label) { btn.disabled = on; if (label) btn.textContent = label; }
+
+async function api(action, data) {
+  if (API_URL.indexOf('PASTE') === 0) throw new Error('Set API_URL in config.js first');
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action, token }, data || {})) });
+  const j = await res.json();
+  if (j.auth) logout(true);
+  if (!j.ok) throw new Error(j.error || 'Request failed');
+  return j;
+}
+async function load() {
+  const res = await fetch(API_URL + '?action=catalog&t=' + Date.now());
+  const d = await res.json();
+  if (!d.ok) throw new Error('Could not load catalogue');
+  cats = d.categories.sort((a, b) => Number(a.order) - Number(b.order));
+  prods = d.products.slice(); // same order as the website
+  render();
+}
+
+function show(loggedIn) { $('#loginView').hidden = loggedIn; $('#appView').hidden = !loggedIn; }
+function logout(expired) {
+  token = ''; sessionStorage.removeItem('adm'); show(false);
+  if (expired) toast('Session expired. Please log in again.', true);
+}
+
+function render() {
+  const opts = cats.map(c => `<option value="${esc(c.slug)}">${esc(c.label)}</option>`).join('');
+  const keepCat = $('#pCat').value, keepF = $('#pFilter').value;
+  $('#pCat').innerHTML = opts || '<option value="">Create a category first</option>';
+  $('#pFilter').innerHTML = '<option value="all">All categories</option>' + opts;
+  if (cats.some(c => c.slug === keepCat)) $('#pCat').value = keepCat;
+  if (keepF === 'all' || cats.some(c => c.slug === keepF)) $('#pFilter').value = keepF || 'all';
+
+  const f = $('#pFilter').value, list = prods.filter(p => f === 'all' || p.category === f);
+  $('#pCount').textContent = list.length;
+  $('#pEmpty').hidden = list.length > 0;
+  $('#items').innerHTML = list.map((p, i) => `
+    <div class="item"><span class="no">${i + 1}</span><img src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy">
+      <div>${esc(p.name)}<div class="acts">
+        <button class="btn btn-outline btn-sm" type="button" data-edit="${esc(p.id)}">Edit</button>
+        <button class="btn btn-danger btn-sm" type="button" data-del="${esc(p.id)}">Delete</button></div></div></div>`).join('');
+  $('#importCard').hidden = prods.length > 0 || typeof PRODUCTS === 'undefined' || !PRODUCTS.length;
+
+  $('#catList').innerHTML = cats.length ? cats.map(c => {
+    const n = prods.filter(p => p.category === c.slug).length;
+    return `<div class="catrow"><i class="fa-solid ${esc(c.icon)}"></i><span>${esc(c.label)}</span>
+      <em class="muted">${n} item${n === 1 ? '' : 's'}</em>
+      <button class="btn btn-danger btn-sm" type="button" data-delcat="${esc(c.slug)}">Delete</button></div>`;
+  }).join('') : '<p class="muted">No categories yet. Add one above.</p>';
+}
+
+function compress(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1200 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+      x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.85).split(',')[1]);
+    };
+    img.onerror = () => reject(new Error('That file is not a supported image (use JPG, PNG or WebP)'));
+    img.src = url;
+  });
+}
+
+// ---- events ----
+$('#cIcon').innerHTML = ICONS.map(i => `<option value="${i[0]}">${i[1]}</option>`).join('');
+
+async function login() {
+  const btn = $('#loginBtn'); busy(btn, true, 'Checking…');
+  try {
+    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', password: $('#pw').value }) });
+    const j = await res.json();
+    if (!j.ok) throw new Error(j.error);
+    token = j.token; sessionStorage.setItem('adm', token); $('#pw').value = '';
+    show(true); await load();
+  } catch (e) { toast(e.message, true); }
+  busy(btn, false, 'Log in');
+}
+$('#loginBtn').onclick = login;
+$('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+$('#logoutBtn').onclick = () => logout();
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  $('#tab-products').hidden = t.dataset.tab !== 'products';
+  $('#tab-categories').hidden = t.dataset.tab !== 'categories';
+});
+
+$('#pImg').onchange = () => {
+  const f = $('#pImg').files[0], p = $('#pPrev');
+  if (!f) { p.hidden = true; return; }
+  p.src = URL.createObjectURL(f); p.hidden = false;
+};
+$('#pFilter').onchange = render;
+
+$('#addProdBtn').onclick = async () => {
+  const btn = $('#addProdBtn'), file = $('#pImg').files[0], name = $('#pName').value.trim(), category = $('#pCat').value;
+  if (!category) return toast('Create a category first', true);
+  if (!name) return toast('Enter a product name', true);
+  if (!file) return toast('Choose a photo', true);
+  busy(btn, true, 'Uploading…');
+  try {
+    const image = await compress(file);
+    await api('addProduct', { category, name, image });
+    $('#pName').value = ''; $('#pImg').value = ''; $('#pPrev').hidden = true;
+    await load(); toast('Product added');
+  } catch (e) { toast(e.message, true); }
+  busy(btn, false, 'Add product');
+};
+
+let editId = null;
+function closeEdit() { $('#editModal').hidden = true; editId = null; $('#eImg').value = ''; }
+function openEdit(id) {
+  const p = prods.find(x => String(x.id) === String(id)); if (!p) return;
+  editId = p.id;
+  const f = $('#pFilter').value, list = prods.filter(x => f === 'all' || x.category === f);
+  $('#eNo').textContent = '(No. ' + (list.findIndex(x => x.id === p.id) + 1) + ')';
+  $('#eCat').innerHTML = cats.map(c => `<option value="${esc(c.slug)}">${esc(c.label)}</option>`).join('');
+  $('#eCat').value = p.category;
+  $('#eName').value = p.name;
+  $('#eImg').value = '';
+  $('#ePrev').src = p.img;
+  $('#editModal').hidden = false;
+  $('#eName').focus();
+}
+$('#eImg').onchange = () => {
+  const f = $('#eImg').files[0];
+  if (f) $('#ePrev').src = URL.createObjectURL(f);
+};
+$('#eCancel').onclick = closeEdit;
+$('#editModal').addEventListener('click', e => { if (e.target.id === 'editModal') closeEdit(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#editModal').hidden) closeEdit(); });
+
+$('#eSave').onclick = async () => {
+  const btn = $('#eSave'), name = $('#eName').value.trim(), category = $('#eCat').value, file = $('#eImg').files[0];
+  if (!name) return toast('Enter a product name', true);
+  if (!category) return toast('Choose a category', true);
+  busy(btn, true, 'Saving…');
+  try {
+    const payload = { id: editId, name, category };
+    if (file) payload.image = await compress(file);
+    await api('updateProduct', payload);
+    closeEdit(); await load(); toast('Product updated');
+  } catch (e) { toast(e.message, true); }
+  busy(btn, false, 'Save changes');
+};
+
+$('#items').onclick = async e => {
+  const ed = e.target.closest('[data-edit]');
+  if (ed) { openEdit(ed.dataset.edit); return; }
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  busy(b, true);
+  try { await api('deleteProduct', { id: b.dataset.del }); await load(); toast('Product deleted'); }
+  catch (err) { toast(err.message, true); busy(b, false); }
+};
+
+$('#addCatBtn').onclick = async () => {
+  const btn = $('#addCatBtn'), label = $('#cName').value.trim();
+  if (!label) return toast('Enter a category name', true);
+  busy(btn, true, 'Adding…');
+  try { await api('addCategory', { label, icon: $('#cIcon').value }); $('#cName').value = ''; await load(); toast('Category added'); }
+  catch (e) { toast(e.message, true); }
+  busy(btn, false, 'Add category');
+};
+
+$('#catList').onclick = async e => {
+  const b = e.target.closest('[data-delcat]'); if (!b) return;
+  if (!confirm('Delete this category?')) return;
+  busy(b, true);
+  try { await api('deleteCategory', { slug: b.dataset.delcat }); await load(); toast('Category deleted'); }
+  catch (err) { toast(err.message, true); busy(b, false); }
+};
+
+$('#importBtn').onclick = async () => {
+  const btn = $('#importBtn'); busy(btn, true, 'Importing…');
+  try {
+    const categories = Object.keys(CATEGORY_META).map(k => ({ slug: k, label: CATEGORY_META[k].label, icon: CATEGORY_META[k].icon }));
+    const r = await api('importAll', { categories, products: PRODUCTS });
+    await load(); toast('Imported ' + r.count + ' products');
+  } catch (e) { toast(e.message, true); }
+  busy(btn, false, 'Import existing products');
+};
+
+// ---- start ----
+if (token) { show(true); load().catch(e => { toast(e.message, true); }); } else show(false);
+</script>
+</body>
+</html>
